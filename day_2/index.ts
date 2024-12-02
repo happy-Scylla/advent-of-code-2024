@@ -24,15 +24,45 @@ const testData: number[][] = [
 	[1, 3, 6, 7, 9],
 ];
 
-const getTotalSumOfSafeReports = (data: number[][]): number => {
-	let countOfSafeReports = 0;
+const getTotalSumOfSafeReports = (data: number[][]): [number, number] => {
+	let safe = 0;
+	let safeAfterSkip = 0;
+
 	for (const row of data) {
-		if (getIsSafeReport(row)) countOfSafeReports++;
+		let isGood = false;
+
+		for (let i = 0; i < row.length; i++) {
+			// check if row is good if we slice one of the elements, if yes --> break
+			const rowButSkippedIndex = [...row.slice(0, i), ...row.slice(i + 1)];
+
+			if (isSafe(rowButSkippedIndex)) {
+				isGood = true;
+				break;
+			}
+		}
+
+		if (isSafe(row)) safe++;
+		if (isSafe(row) || isGood) safeAfterSkip++;
 	}
 
-	return countOfSafeReports;
+	return [safe, safeAfterSkip];
 };
 
+const isSafe = (report: number[]): boolean => {
+	const diff: number[] = [];
+
+	// get diff of index and adjancent
+	for (let i = 1; i < report.length; i++) {
+		diff.push(report[i] - report[i - 1]);
+	}
+
+	const isIncreasing = diff.every((element) => element >= 1 && element <= 3);
+	const isDecreasing = diff.every((element) => element <= -1 && element >= -3);
+
+	return isIncreasing || isDecreasing;
+};
+
+// old solution, only worked for part one
 const getIsSafeReport = (report: number[]): boolean => {
 	const firstElement = report.at(0);
 	const secondElement = report.at(1);
@@ -60,4 +90,6 @@ const getIsSafeReport = (report: number[]): boolean => {
 	return true;
 };
 
-console.log(`total safe reports: ${getTotalSumOfSafeReports(realData)}`);
+const [safe, safeAfterSkip] = getTotalSumOfSafeReports(realData);
+console.log(`total safe reports: ${safe}`);
+console.log(`total safe reports (with skipping): ${safeAfterSkip}`);
