@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { exit } from 'node:process';
 
 const testInstruction = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
-let realData: string = '';
+let realData: string;
 let result = 0;
 
 try {
