@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { exit } from 'node:process';
 
-let realData: string;
+const testInstruction = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
+let realData: string = '';
+let result = 0;
+
 try {
 	realData = readFileSync('./puzzle.txt', 'utf-8');
 } catch (err) {
@@ -9,12 +12,9 @@ try {
 	exit(1);
 }
 
-const testInstruction = 'xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))';
-
-// Regex for finding the pattern mul(:bumberBetween1And999:,:bumberBetween1And999:)
-const searchRegex = /mul\(\d{1,3},\d{1,3}\)/g;
+// Regex for finding the pattern mul(:bumberBetween1And999:,:bumberBetween1And999:) or do() or don't()
+const searchRegex = /mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)/g;
 const allMatches = realData.match(searchRegex) || [];
-let result = 0;
 
 const getNumbersFromMul = (value: string): [number, number] => {
 	const numberString = value
@@ -30,9 +30,17 @@ const getNumbersFromMul = (value: string): [number, number] => {
 	return [numberString[0], numberString[1]];
 };
 
+let shouldAdd = true;
 for (const match of allMatches) {
-	const [num1, num2] = getNumbersFromMul(match);
-	result += num1 * num2;
+	if (shouldAdd && match.startsWith('mul')) {
+		const [num1, num2] = getNumbersFromMul(match);
+		result += num1 * num2;
+
+		continue;
+	}
+
+	if (match === "don't()") shouldAdd = false;
+	if (match === 'do()') shouldAdd = true;
 }
 
 console.log(result);
