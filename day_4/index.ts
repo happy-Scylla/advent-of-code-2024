@@ -6,7 +6,6 @@ const testRiddle: string =
 	'MMMSXXMASM,MSAMXMSMSA,AMXSXMAAMM,MSAMASMSMX,XMASAMXAMM,XXAMMXXAMA,SMSMSASXSS,SAXAMASAAA,MAMMMXMMMM,MXMXAXMASX';
 
 let realData: string;
-
 try {
 	realData = readFileSync('./my_riddle.txt', 'utf-8').split('\n').join(',');
 } catch (err) {
@@ -32,6 +31,66 @@ const solveRiddle = (riddle: string): number => {
 	}
 
 	return count;
+};
+
+const solveCrossRiddle = (riddle: string): number => {
+	const riddle2dArray = riddle.split(',').map((row) => row.split(''));
+
+	let rowIndex = 0;
+	let count = 0;
+
+	for (const row of riddle.split(',')) {
+		for (const hit of findPatternIndices(row)) {
+			if (checkCross(riddle2dArray, rowIndex, hit)) {
+				count++;
+			}
+		}
+		rowIndex++;
+	}
+
+	return count;
+};
+
+const findPatternIndices = (input: string): number[] => {
+	const pattern = /(S|M)[A-Za-z](S|M)/g;
+	const indices: number[] = [];
+	let match: RegExpExecArray | null;
+
+	while (true) {
+		match = pattern.exec(input);
+		if (match === null) break;
+
+		if (match.index !== undefined) {
+			indices.push(match.index);
+			pattern.lastIndex = match.index + 1;
+		}
+	}
+
+	return indices;
+};
+
+const checkCross = (riddle: string[][], indexRow: number, indexCol: number): boolean => {
+	const rowCount = riddle.length;
+	const colCount = riddle[indexRow].length;
+	if (indexRow + 2 >= rowCount || indexCol + 2 >= colCount) return false;
+
+	if (riddle[indexRow + 1][indexCol + 1] !== 'A') return false;
+
+	// check top left to bottom right
+	const topLeft = riddle[indexRow][indexCol];
+	const bottomRight = riddle[indexRow + 2][indexCol + 2];
+
+	if (topLeft === 'M' && bottomRight !== 'S') return false;
+	if (topLeft === 'S' && bottomRight !== 'M') return false;
+
+	// check top right to bottom left
+	const topRight = riddle[indexRow][indexCol + 2];
+	const bottomLeft = riddle[indexRow + 2][indexCol];
+
+	if (topRight === 'M' && bottomLeft !== 'S') return false;
+	if (topRight === 'S' && bottomLeft !== 'M') return false;
+
+	return true;
 };
 
 const checkAllDirections = (riddle: string[][], indexRow: number, indexCol: number): number => {
@@ -130,3 +189,4 @@ const checkDiagonal = (riddle: string[][], indexRow: number, indexCol: number): 
 };
 
 console.log(solveRiddle(realData));
+console.log(solveCrossRiddle(realData));
