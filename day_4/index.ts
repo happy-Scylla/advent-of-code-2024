@@ -69,11 +69,17 @@ const findPatternIndices = (input: string): number[] => {
 	return indices;
 };
 
-const checkCross = (riddle: string[][], indexRow: number, indexCol: number): boolean => {
+const checkIfInBounds = (riddle: string[][], currentColIndex: number, currentRowIndex: number): boolean => {
 	const rowCount = riddle.length;
-	const colCount = riddle[indexRow].length;
-	if (indexRow + 2 >= rowCount || indexCol + 2 >= colCount) return false;
+	const colCount = riddle[currentRowIndex].length;
 
+	return currentRowIndex + 2 >= rowCount || currentColIndex + 2 >= colCount;
+};
+
+const checkCross = (riddle: string[][], indexRow: number, indexCol: number): boolean => {
+	if (checkIfInBounds(riddle, indexCol, indexRow)) return false;
+
+	// check if middle is A
 	if (riddle[indexRow + 1][indexCol + 1] !== 'A') return false;
 
 	// check top left to bottom right
