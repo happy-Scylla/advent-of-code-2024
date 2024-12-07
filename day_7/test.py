@@ -6,16 +6,16 @@ def check_equation(result, rest):
     if len(rest) == 1:
         return rest[0] == result
 
-    lastNumber = rest[-1]
-    can_multiply = check_equation(result // lastNumber, rest[:-1]) if result % lastNumber == 0 else False
-    can_add = check_equation(result - lastNumber, rest[:-1])
+    last_number = rest[-1]
+    can_multiply = check_equation(result // last_number, rest[:-1]) if result % last_number == 0 else False
+    can_add = check_equation(result - last_number, rest[:-1])
 
     next_power_of_10 = 1
-    while next_power_of_10 <= lastNumber:
+    while next_power_of_10 <= last_number:
         next_power_of_10 *= 10
 
-    if (result - lastNumber) % next_power_of_10 == 0:
-        can_concat = check_equation((result - lastNumber) // next_power_of_10, rest[:-1])
+    if (result - last_number) % next_power_of_10 == 0:
+        can_concat = check_equation((result - last_number) // next_power_of_10, rest[:-1])
     else:
         can_concat = False
 
